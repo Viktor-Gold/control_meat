@@ -1,0 +1,229 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(40, 40, 40);
+    color: rgb(250, 238, 223);
+}
+
+
+header {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    text-shadow:
+        1px 1px 0 black,
+        -1px -1px 0 black,
+        1px -1px 0 black,
+        -1px 1px 0 black;
+}
+
+header div:nth-child(1) {
+    color: rgb(138, 15, 15);
+    font-size: 30px;
+    font-weight: bold;
+}
+
+header div:nth-child(2) {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+    font-size: 26px;
+    margin-left: -20px;
+    font-weight: bold;
+}
+
+header img {
+    width: 32px;
+}
+
+
+#container_accounting {
+    overflow: hidden;
+    /* background-image: url(/public/Smoking_by_George.jpg); */
+    background-color: black;
+    /* box-shadow: 1px 1px 30px brown; */
+    background-size: 520px;
+    background-position: -50px 0px;
+    background-repeat: no-repeat;
+    margin-top: 20px;
+    /* max-width: 500px; */
+    display: flex;
+    gap: 40px;
+    flex-direction: column;
+    padding: 10px;
+    color: rgb(250, 238, 223);
+    
+}
+
+#container_accounting>div {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#container_accounting input{
+    width: 95%;
+}
+
+.headings {
+    font-size: 20px;
+    background-color:black;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.weight {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    align-items: center;
+    /* justify-content: space-between; */
+    gap: 20px;
+}
+
+.weight div {
+    width: 100%;
+}
+
+.weight div:nth-child(1) input {
+    background-color: black;
+    padding: 10px;
+    color: rgb(250, 238, 223);
+    outline: brown;
+    border: 2px solid rgb(138, 15, 15);
+    border-radius: 10px;
+}
+
+.weight div:nth-child(1) input::placeholder {
+    color: rgb(250, 238, 223);
+}
+
+.custom_select {
+    width: 92%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background-color: black;
+    padding: 10px;
+    color: rgb(250, 238, 223);
+    outline: brown;
+    border: 2px solid rgb(138, 15, 15);
+    border-radius: 10px;
+}
+.custom_select span:nth-child(2) {
+    display: block;
+    height: 12px;
+    color: rgb(138, 15, 15);
+}
+
+.select_option {
+    display: none; /*! Скрываем кастомный селектор */
+    height: 100px;
+    margin-left: -30px;
+    /* border: 1px solid white; */
+    overflow-Y: scroll;
+}
+.select_option li {
+    cursor: pointer;
+    padding: 2px;
+}
+.select_option li::marker {
+    content: '';
+}
+.select_option li:hover {
+    background-color: rgb(138, 15, 15)
+}
+.select_option::-webkit-scrollbar {
+    background-color: rgb(138, 15, 15);
+    background-color: rgb(250, 238, 223);;
+    border-radius: 10px;
+}
+.select_option::-webkit-scrollbar-track {
+    width: 230px;
+    cursor: pointer;
+    border-radius: 20px;
+}
+.select_option::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 10px;
+    background-color: black;
+    border: 2px solid rgb(138, 15, 15);
+}
+
+
+.btn {
+    /* width: 60%; */
+    border-radius: 5px;
+    padding: 10px;
+    background-color: rgb(138, 15, 15);
+    color: rgb(250, 238, 223);
+    cursor: pointer;
+    transition: 0.5s;
+}
+
+.btn:hover {
+    color: rgb(138, 15, 15);
+    background-color: transparent;
+    box-shadow: 1px 1px 20px brown;
+
+}
+
+#saleMeat, #addMeat {
+    /* width: 100%; */
+    position: relative;
+    /* display: inline-block; */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* border: 1px solid white; */
+}
+
+#balance {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+}
+
+#balance div{
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border: 1px solid brown;
+}
+
+#balance > :nth-child(-n+3) {
+    font-size: 16px;
+    /* letter-spacing: 1px; */
+    font-weight: bold;
+}
+
+#footer {
+    margin-top: -30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#footer div {
+    font-size: 25px;
+}

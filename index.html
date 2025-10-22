@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>control_meat</title>
+  </head>
+  <body>
+    <header>
+        <div>МПЦ "ГЕОРГИЕВСКИЙ"</div>
+        <div><img src="/public/axe_butchers.png" alt="">УЧЕТ КОПЧЕНИЯ</div>
+    </header>
+
+    <div id="container_accounting">
+        <div>
+            <div class="headings">ДОБАВИТЬ СЫРЬЕ В ЗАСОЛ</div>
+            <div id="addMeat">
+                <div class="custom_select">
+                    <span class="selected">Наименование позиции</span>
+                    <span>﹀</span>
+                </div>
+                <div class="select_option">
+                    <ul>
+                        <li data-value="marbledSausages" data-loss="0">Сосиски мраморные</li>
+                        <li data-value="beefSausages" data-loss="0">Сосиски говяжьи</li>
+                        <li data-value="chickenSausages" data-loss="0">Сосиски куриные</li>
+                        <li data-value="porkBeefSausages" data-loss="0">Сосиски свино-говяжьи</li>
+                        <li data-value="porkSausages" data-loss="0">Сосиски свиные</li>
+                        <li data-value="chickenHam" data-loss="8">Куриная ветчина</li>
+                        <li data-value="chickenCarcass" data-loss="20">Тушка</li>
+                        <li data-value="chickenWings" data-loss="20">Куриные крылышки</li>
+                        <li data-value="chickenLeg" data-loss="20">Куриный окорочок</li>
+                        <li data-value="chickenBreast" data-loss="20">Грудка на кости</li>
+                        <li data-value="chickenFillet" data-loss="20">Куриное филе</li>
+                        <li data-value="chickenBacks" data-loss="20">Куриные спинки</li>
+                        <li data-value="porkTenderloin" data-loss="20">Вырезка свиная</li>
+                        <li data-value="porkRibs" data-loss="20">Ребрышки деликатесные</li>
+                        <li data-value="porkBelly" data-loss="20">Грудинка свиная</li>
+                        <li data-value="porkHam" data-loss="20">Буженина</li>
+                        <li data-value="meatBomb" data-loss="20">Мясная бомба</li>
+                        <li data-value="signatureLard" data-loss="8">Сало фирменное</li>
+                        <li data-value="lard" data-loss="20">Сало копченое</li>
+                    </ul>
+                </div>
+            </div>
+    
+            <div class="weight">
+                <div><input type="number" placeholder="Вес сырого мяса (кг)"></div>
+                <div><input class="btn" type="submit" value="Добавить"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="headings">РЕГУЛИРОВАТЬ ОСТАТОК</div>
+            <div id="saleMeat">
+                <div class="custom_select">
+                    <span class="selected">Наименование позиции</span>
+                    <span>﹀</span>
+                </div>
+                <div class="select_option">
+                    <ul>
+                        <li data-value="marbledSausages" data-loss="0">Сосиски мраморные</li>
+                        <li data-value="beefSausages" data-loss="0">Сосиски говяжьи</li>
+                        <li data-value="chickenSausages" data-loss="0">Сосиски куриные</li>
+                        <li data-value="porkBeefSausages" data-loss="0">Сосиски свино-говяжьи</li>
+                        <li data-value="porkSausages" data-loss="0">Сосиски свиные</li>
+                        <li data-value="chickenHam" data-loss="8">Куриная ветчина</li>
+                        <li data-value="chickenCarcass" data-loss="20">Тушка</li>
+                        <li data-value="chickenWings" data-loss="20">Куриные крылышки</li>
+                        <li data-value="chickenLeg" data-loss="20">Куриный окорочок</li>
+                        <li data-value="chickenBreast" data-loss="20">Грудка на кости</li>
+                        <li data-value="chickenFillet" data-loss="20">Куриное филе</li>
+                        <li data-value="chickenBacks" data-loss="20">Куриные спинки</li>
+                        <li data-value="porkTenderloin" data-loss="20">Вырезка свиная</li>
+                        <li data-value="porkRibs" data-loss="20">Ребрышки деликатесные</li>
+                        <li data-value="porkBelly" data-loss="20">Грудинка свиная</li>
+                        <li data-value="porkHam" data-loss="20">Буженина</li>
+                        <li data-value="meatBomb" data-loss="20">Мясная бомба</li>
+                        <li data-value="signatureLard" data-loss="8">Сало фирменное</li>
+                        <li data-value="lard" data-loss="20">Сало копченое</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="weight">
+                <div><input type="number" placeholder="Продано (кг)"></div>
+                <div><input class="btn" type="submit" value="Продать"></div>
+            </div>
+        </div>
+
+        <div>
+            <div class="headings">ОСТАТКИ ПО КОПЧЕНОЙ ПРОДУКЦИИ:</div>
+            <div id="balance">
+                <div>Наименование позиции</div>
+                <div>Остаток</div>
+                <div>Цена</div>
+                <div>Сосиски мраморные</div>
+                <div>0</div>
+                <div>790</div>
+                <div>Сосиски говяжьи</div>
+                <div>0</div>
+                <div>680</div>
+                <div>Сосиски куриные</div>
+                <div>0</div>
+                <div>650</div>
+                <div>Сосиски свино-говяжьи</div>
+                <div>0</div>
+                <div>550</div>
+                <div>Сосиски свиные</div>
+                <div>0</div>
+                <div>550</div>
+                <div>Куриная ветчина</div>
+                <div>0</div>
+                <div>700</div>
+                <div>Куриная тушка</div>
+                <div>0</div>
+                <div>550</div>
+                <div>Куриные крылья</div>
+                <div>0</div>
+                <div>550</div>
+                <div>Куриный окорочок</div>
+                <div>0</div>
+                <div>550</div>
+                <div>Грудка на кости</div>
+                <div>0</div>
+                <div>600</div>
+                <div>Куриное филе</div>
+                <div>0</div>
+                <div>600</div>
+                <div>Спинки</div>
+                <div>0</div>
+                <div>290</div>
+                <div>Вырезка свиная</div>
+                <div>0</div>
+                <div>750</div>
+                <div>Ребрышки деликатесные</div>
+                <div>0</div>
+                <div>690</div>
+                <div>Грудинка свиная</div>
+                <div>0</div>
+                <div>750</div>
+                <div>Буженина</div>
+                <div>0</div>
+                <div>680</div>
+                <div>Мясная бомба</div>
+                <div>0</div>
+                <div>580</div>
+                <div>Сало фирменное</div>
+                <div>0</div>
+                <div>300</div>
+                <div>Сало</div>
+                <div>0</div>
+                <div>300</div>
+            </div>
+        </div>
+        <div id="footer">
+            <div class="headings">НЕ ЗАБЫВАЙ — ЦИФРЫ НЕ ВРУТ</div>
+        </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
