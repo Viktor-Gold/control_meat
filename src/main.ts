@@ -3,6 +3,20 @@ import './style.css'
 const addMeat = document.querySelector('#addMeat') as HTMLDivElement // Блок добавления
 const saleMeat = document.querySelector('#saleMeat') as HTMLDivElement // Блок продаж
 
+const addBtn = document.querySelector('#addBtn') as HTMLInputElement // Кнопка "Добавить"
+const saleBtn = document.querySelector('#saleBtn') as HTMLInputElement // Кнопка "Продать"
+
+const namePosition = document.querySelector('#addMeat .custom_select') as HTMLSpanElement // Наименование позиции
+const addValue = document.querySelector('#addValue') as HTMLInputElement // Вес сырого мяса
+
+namePosition.addEventListener('click', () => {
+  // namePosition.style.display = 'none'
+})
+
+addBtn.addEventListener('click', () => {
+  // addValue.value += '10'
+})
+
 // Функця переключателя селектора open/close 
 const functionToggle = (id:any) => { 
   id = document.querySelector(id) as HTMLElement // id родителя 

@@ -154,7 +154,7 @@ header img {
 }
 .select_option::-webkit-scrollbar {
     background-color: rgb(138, 15, 15);
-    background-color: rgb(250, 238, 223);;
+    background-color: rgb(250, 238, 223);
     border-radius: 10px;
 }
 .select_option::-webkit-scrollbar-track {
