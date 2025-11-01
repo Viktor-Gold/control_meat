@@ -12,19 +12,22 @@ const saleValue = document.querySelector('#saleValue') as HTMLInputElement
 //! Таблица остатков
 const balance = document.querySelector('#balance') as HTMLDivElement
 
-let addDataValue = '' // Наименование позиции для добавления
+let addDataValue = ''// Наименование позиции для добавления сырья
 let dataLoss = 0 // Процент потерь
 
 let saleDataValue = '' // Наименование позиции для продаж
 
 //! Открыть/Закрыть кастомный селектор
 function functionToggle(id: string) {
-  const container = document.querySelector(id) as HTMLElement
+  // Одинаковые классы в разных id, поэтому задаем параметр id
+  const container = document.querySelector(id) as HTMLElement // Теперь container наш id
+  // Находим наши классы внутри каждого id
   const head = container.querySelector('.custom_select') as HTMLElement // Наименование позиции
   const dropdown = container.querySelector('.select_option') as HTMLElement // Кастомный селектор
 
   head.addEventListener('click', () => {
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block'
+    // Открываем селектор выбора 
+    dropdown.style.display = dropdown.style.display == 'block' ? 'none' : 'block'
   })
 
   // Закрывает селектор при клике вне родителя
@@ -38,26 +41,26 @@ functionToggle('#saleMeat')
 
 //! ФУНКЦИЯ УСТАНОВКИ ОБРАБОТЧИКОВ НА СТРАНИЦЫ ВЫБОРА
 function setupSelect(id: string, mode: 'add' | 'sale') {
-  const container = document.querySelector(id) as HTMLElement
-  const displayed = container.querySelector('.custom_select .selected') as HTMLElement
-  const options = container.querySelectorAll('.select_option li') as NodeListOf<HTMLLIElement>
+  const container = document.querySelector(id) as HTMLElement // Снова заносим наши id в переменную
+  const displayed = container.querySelector('.custom_select .selected') as HTMLSpanElement // Наименование позиции
+  //Находим все теги li в нашем кастомном селекторе
+  const options = container.querySelectorAll('.select_option li') as NodeListOf<HTMLLIElement> 
 
   options.forEach((li) => {
+    // Проходим по каждому эл-ту нашего селектора
     li.addEventListener('click', () => {
-      // ставим видимый текст
-      displayed.textContent = li.textContent || '—'
+      displayed.textContent = li.textContent //заносим наименование эл-та
+      const value = String(li.dataset.value) // Получаем имя позиции из атрибута
+      const loss = Number(li.dataset.loss) // Получаем процент потерь
 
-      const value = li.dataset.value || ''
-      const loss = Number(li.dataset.loss) || 0
-
-      if (mode === 'add') {
+      if (mode == 'add') { // Если клик по li в блоке добавления
         addDataValue = value
         dataLoss = loss
-      } else {
+      } else { // Если клик по li в блоке продаж
         saleDataValue = value
       }
 
-      // прячем dropdown
+      // прячем селектор (dropdown) после клика по наименованию
       const parent = li.closest('.select_option') as HTMLElement
       if (parent) parent.style.display = 'none'
     })
@@ -67,10 +70,10 @@ function setupSelect(id: string, mode: 'add' | 'sale') {
 setupSelect('#addMeat', 'add')
 setupSelect('#saleMeat', 'sale')
 
-// ======= УТИЛИТА: находим ячейку остатка по data-value =======
-function findWeightCell(value: string): HTMLDivElement | null {
-  // структура: nameDiv (с data-value), weightDiv, priceDiv (повторяется)
-  const children = Array.from(balance.children) as HTMLDivElement[]
+// Находим ячейку остатка в таблице по data-value
+function findWeightCell(value: string) {
+  //! структура: nameDiv (с data-value), weightDiv, priceDiv
+  const children = Array.from(balance.children) 
 
   for (let i = 0; i < children.length; i += 3) {
     const nameDiv = children[i]
@@ -78,7 +81,7 @@ function findWeightCell(value: string): HTMLDivElement | null {
 
     // у блока nameDiv есть атрибут data-value (мы его вставили в HTML)
     const dv = nameDiv.getAttribute('data-value')
-    if (dv === value) {
+    if (dv == value) {
       return weightDiv
     }
   }

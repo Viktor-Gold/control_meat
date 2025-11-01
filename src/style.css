@@ -17,22 +17,27 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-image: url(/public/Наша_продукция.png);
+    background-size: cover;
     background-color: rgb(40, 40, 40);
     color: rgb(250, 238, 223);
 }
 
 
 header {
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px;
+    border-radius: 20px;
     margin-top: 40px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
     text-shadow:
-        1px 1px 0 black,
-        -1px -1px 0 black,
-        1px -1px 0 black,
-        -1px 1px 0 black;
+    1px 1px 0 black,
+    -1px -1px 0 black,
+    1px -1px 0 black,
+    -1px 1px 0 black;
 }
 
 header div:nth-child(1) {
@@ -58,20 +63,16 @@ header img {
 
 #container_accounting {
     overflow: hidden;
-    /* background-image: url(/public/Smoking_by_George.jpg); */
-    background-color: black;
-    /* box-shadow: 1px 1px 30px brown; */
+    background-color: rgba(0, 0, 0);
     background-size: 520px;
     background-position: -50px 0px;
     background-repeat: no-repeat;
     margin-top: 20px;
-    /* max-width: 500px; */
     display: flex;
     gap: 40px;
     flex-direction: column;
     padding: 10px;
     color: rgb(250, 238, 223);
-    
 }
 
 #container_accounting>div {
@@ -95,7 +96,6 @@ header img {
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     align-items: center;
-    /* justify-content: space-between; */
     gap: 20px;
 }
 
@@ -137,9 +137,13 @@ header img {
 
 .select_option {
     display: none; /*! Скрываем кастомный селектор */
-    height: 100px;
+    position: absolute;
+    top: 50px;
+    left: 25px;
+    background-color: black;
+    height: 136px;
+    width: 400px;
     margin-left: -30px;
-    /* border: 1px solid white; */
     overflow-Y: scroll;
 }
 .select_option li {
@@ -171,7 +175,6 @@ header img {
 
 
 .btn {
-    /* width: 60%; */
     border-radius: 5px;
     padding: 10px;
     background-color: rgb(138, 15, 15);
