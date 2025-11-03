@@ -8,6 +8,7 @@ const addValue = document.querySelector('#addValue') as HTMLInputElement
 const saleValue = document.querySelector('#saleValue') as HTMLInputElement
 //! Таблица остатков
 const balance = document.querySelector('#balance') as HTMLDivElement
+const summaryDiv = document.querySelector('#summary') as HTMLDivElement // Итоговая сумма
 
 let addDataValue = ''// Наименование позиции для добавления сырья
 let dataLoss = 0 // Процент потерь
@@ -36,7 +37,7 @@ function functionToggle(id: string) {
 functionToggle('#addMeat') // Блок добавления сырья
 functionToggle('#saleMeat') // Блок продаж
 
-//! ФУНКЦИЯ УСТАНОВКИ ОБРАБОТЧИКОВ НА СТРАНИЦЫ ВЫБОРА
+//! Настройка селекторов выбора позиции в разных блоках
 function setupSelect(id: string, mode: 'add' | 'sale') { 
   const container = document.querySelector(id) as HTMLElement // Снова заносим наши id в переменную
   const displayed = container.querySelector('.custom_select .selected') as HTMLSpanElement // Наименование позиции
@@ -67,84 +68,76 @@ function setupSelect(id: string, mode: 'add' | 'sale') {
 setupSelect('#addMeat', 'add') 
 setupSelect('#saleMeat', 'sale')
 
-// Находим ячейку остатка в таблице по data-value
-function findWeightCell(value: string) {
-  // Находим div с нужным data-value
-  const nameDiv = balance.querySelector(`div[data-value="${value}"]`) as HTMLDivElement | null
+// Поиск строки позиции в таблице остатков
+function findRow(value: string) {
+  const nameDiv = balance.querySelector(`div[data-value="${value}"]`) as HTMLDivElement
+  if (!nameDiv) return null
 
-  if (!nameDiv) {
-    alert(`Позиция с data-value="${value}" не найдена в таблице остатков`)
-    return null
-  }
+  const weightDiv = nameDiv.nextElementSibling as HTMLDivElement // вес
+  const priceDiv = weightDiv?.nextElementSibling as HTMLDivElement // цена
+  const sumDiv = priceDiv?.nextElementSibling as HTMLDivElement // сумма
 
-  // Ищем следующий соседний div — предполагаем, что он содержит вес
-  const weightDiv = nameDiv.nextElementSibling as HTMLDivElement | null
-
-  if (!weightDiv) {
-    alert(`Не найден соседний элемент (вес) для позиции "${value}"`)
-    return null
-  }
-
-  return weightDiv
+  return { nameDiv, weightDiv, priceDiv, sumDiv }
 }
 
-// ФУНКЦИЯ РАСЧЕТА ПОТЕРЬ
+// Расчёт потерь
 function calculateNetWeight(rawKg: number, lossPercent: number): number {
   const lossKg = (rawKg * lossPercent) / 100
   return rawKg - lossKg
 }
 
-// ПРОВЕРКА ДОБАВИТЬ
+// Обновление суммы позиции и общей суммы
+function updateSums() {
+  let totalSum = 0
+  const rows = balance.querySelectorAll('div[data-value]')
+
+  rows.forEach((nameDiv) => {
+    const weightDiv = nameDiv.nextElementSibling as HTMLDivElement
+    const priceDiv = weightDiv.nextElementSibling as HTMLDivElement
+    const sumDiv = priceDiv.nextElementSibling as HTMLDivElement
+
+    const weight = Number(weightDiv.textContent)
+    const price = Number(priceDiv.textContent)
+    const sum = weight * price
+
+    sumDiv.textContent = sum.toFixed(2)
+    totalSum += sum
+  })
+
+  summaryDiv.textContent = `Итоговая сумма: ${totalSum.toFixed(2)} ₽`
+}
+
+// Добавить продукцию
 addBtn.addEventListener('click', () => {
   const raw = Number(addValue.value)
-  if (!addDataValue) {
-    alert('Пожалуйста, выберите позицию для добавления.')
-    return
-  }
-  if (!raw || raw <= 0) {
-    alert('Введите корректный вес (больше 0).')
-    return
-  }
+  if (!addDataValue) return alert('Выберите позицию для добавления.')
+  if (!raw || raw <= 0) return alert('Введите корректный вес.')
 
   const net = calculateNetWeight(raw, dataLoss)
-  const weightCell = findWeightCell(addDataValue)
-  if (!weightCell) {
-    alert('Не найдена строка в таблице для данной позиции.')
-    return
-  }
+  const row = findRow(addDataValue)
+  if (!row || !row.weightDiv) return alert('Позиция не найдена.')
 
-  const current = Number(weightCell.textContent) || 0
-  const updated = current + net
-  weightCell.textContent = updated.toFixed(2)
+  const current = Number(row.weightDiv.textContent) || 0
+  row.weightDiv.textContent = (current + net).toFixed(2)
 
   addValue.value = ''
+  updateSums()
 })
 
-// ПРОВЕРКА ПРОДАЖ
+// Продать продукцию (уменьшить остаток)
 saleBtn.addEventListener('click', () => {
   const sold = Number(saleValue.value)
-  if (!saleDataValue) {
-    alert('Пожалуйста, выберите позицию для продажи.')
-    return
-  }
-  if (!sold || sold <= 0) {
-    alert('Введите корректный вес для продажи!')
-    return
-  }
+  if (!saleDataValue) return alert('Выберите позицию для продажи.')
+  if (!sold || sold <= 0) return alert('Введите корректный вес продажи.')
 
-  const weightCell = findWeightCell(saleDataValue)
-  if (!weightCell) {
-    alert('Не найдена строка в таблице для данной позиции.')
-    return
-  }
+  const row = findRow(saleDataValue)
+  if (!row || !row.weightDiv) return alert('Позиция не найдена.')
 
-  const current = Number(weightCell.textContent)
-  if (sold > current) {
-    alert('Недостаточно остатка для продажи.')
-    return
-  }
+  const current = Number(row.weightDiv.textContent)
+  if (sold > current) return alert('Недостаточно остатка!')
 
-  const updated = current - sold
-  weightCell.textContent = updated.toFixed(2)
+  row.weightDiv.textContent = (current - sold).toFixed(2)
+
   saleValue.value = ''
+  updateSums()
 })

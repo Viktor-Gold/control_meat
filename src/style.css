@@ -215,16 +215,14 @@ header img {
     border: 1px solid brown;
 }
 
-#balance>div:nth-child(-n+4), #balance>div:nth-child(77){
+#balance>div:nth-child(-n+4), #summary, #balance>div:nth-child(77){
     font-size: 16px;
     /* letter-spacing: 1px; */
     font-weight: bold;
 }
 
-#balance>div:nth-last-child(-n+3) {
-    /* border: 1px solid brown; */
-    border-left: none;
-    outline: none;
+#summary {
+    grid-column: 1/5;
 }
 
 #footer {
