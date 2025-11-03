@@ -1,8 +1,5 @@
 import './style.css'
 
-const addMeat = document.querySelector('#addMeat') as HTMLElement // Блок добавления сырья
-const saleMeat = document.querySelector('#saleMeat') as HTMLElement // Блок продаж
-
 //! Кнопки
 const addBtn = document.querySelector('#addBtn') as HTMLInputElement
 const saleBtn = document.querySelector('#saleBtn') as HTMLInputElement
@@ -26,7 +23,7 @@ function functionToggle(id: string) {
   const dropdown = container.querySelector('.select_option') as HTMLElement // Кастомный селектор
 
   head.addEventListener('click', () => {
-    // Открываем селектор выбора 
+    // Открываем селектор выбора
     dropdown.style.display = dropdown.style.display == 'block' ? 'none' : 'block'
   })
 
@@ -36,11 +33,11 @@ function functionToggle(id: string) {
   })
 }
 
-functionToggle('#addMeat')
-functionToggle('#saleMeat')
+functionToggle('#addMeat') // Блок добавления сырья
+functionToggle('#saleMeat') // Блок продаж
 
 //! ФУНКЦИЯ УСТАНОВКИ ОБРАБОТЧИКОВ НА СТРАНИЦЫ ВЫБОРА
-function setupSelect(id: string, mode: 'add' | 'sale') {
+function setupSelect(id: string, mode: 'add' | 'sale') { 
   const container = document.querySelector(id) as HTMLElement // Снова заносим наши id в переменную
   const displayed = container.querySelector('.custom_select .selected') as HTMLSpanElement // Наименование позиции
   //Находим все теги li в нашем кастомном селекторе
@@ -54,48 +51,50 @@ function setupSelect(id: string, mode: 'add' | 'sale') {
       const loss = Number(li.dataset.loss) // Получаем процент потерь
 
       if (mode == 'add') { // Если клик по li в блоке добавления
-        addDataValue = value
-        dataLoss = loss
+        addDataValue = value // Имя позиции
+        dataLoss = loss // Процент потерь
       } else { // Если клик по li в блоке продаж
         saleDataValue = value
       }
 
-      // прячем селектор (dropdown) после клика по наименованию
+      // прячем селектор после выбора позиции
       const parent = li.closest('.select_option') as HTMLElement
-      if (parent) parent.style.display = 'none'
+      parent.style.display = 'none'
     })
   })
 }
-
-setupSelect('#addMeat', 'add')
+// Вызываем функцию на блок добавления и блок продаж
+setupSelect('#addMeat', 'add') 
 setupSelect('#saleMeat', 'sale')
 
 // Находим ячейку остатка в таблице по data-value
 function findWeightCell(value: string) {
-  //! структура: nameDiv (с data-value), weightDiv, priceDiv
-  const children = Array.from(balance.children) 
+  // Находим div с нужным data-value
+  const nameDiv = balance.querySelector(`div[data-value="${value}"]`) as HTMLDivElement | null
 
-  for (let i = 0; i < children.length; i += 3) {
-    const nameDiv = children[i]
-    const weightDiv = children[i + 1]
-
-    // у блока nameDiv есть атрибут data-value (мы его вставили в HTML)
-    const dv = nameDiv.getAttribute('data-value')
-    if (dv == value) {
-      return weightDiv
-    }
+  if (!nameDiv) {
+    alert(`Позиция с data-value="${value}" не найдена в таблице остатков`)
+    return null
   }
-  return null
+
+  // Ищем следующий соседний div — предполагаем, что он содержит вес
+  const weightDiv = nameDiv.nextElementSibling as HTMLDivElement | null
+
+  if (!weightDiv) {
+    alert(`Не найден соседний элемент (вес) для позиции "${value}"`)
+    return null
+  }
+
+  return weightDiv
 }
 
-// ======= ФУНКЦИЯ РАСЧЕТА ПОТЕРЬ =======
+// ФУНКЦИЯ РАСЧЕТА ПОТЕРЬ
 function calculateNetWeight(rawKg: number, lossPercent: number): number {
   const lossKg = (rawKg * lossPercent) / 100
-  const net = rawKg - lossKg
-  return net
+  return rawKg - lossKg
 }
 
-// ======= ОБРАБОТКА ДОБАВИТЬ =======
+// ПРОВЕРКА ДОБАВИТЬ
 addBtn.addEventListener('click', () => {
   const raw = Number(addValue.value)
   if (!addDataValue) {
@@ -108,7 +107,6 @@ addBtn.addEventListener('click', () => {
   }
 
   const net = calculateNetWeight(raw, dataLoss)
-
   const weightCell = findWeightCell(addDataValue)
   if (!weightCell) {
     alert('Не найдена строка в таблице для данной позиции.')
@@ -119,13 +117,10 @@ addBtn.addEventListener('click', () => {
   const updated = current + net
   weightCell.textContent = updated.toFixed(2)
 
-  // Сброс поля ввода (чисто UX)
   addValue.value = ''
-  // Для защиты — лог
-  console.log(`Добавлено ${raw}кг (net ${net.toFixed(2)}кг) к ${addDataValue}. Итог ${updated.toFixed(2)}кг`)
 })
 
-// ======= ОБРАБОТКА ПРОДАТЬ =======
+// ПРОВЕРКА ПРОДАЖ
 saleBtn.addEventListener('click', () => {
   const sold = Number(saleValue.value)
   if (!saleDataValue) {
@@ -133,7 +128,7 @@ saleBtn.addEventListener('click', () => {
     return
   }
   if (!sold || sold <= 0) {
-    alert('Введите корректный вес для продажи (больше 0).')
+    alert('Введите корректный вес для продажи!')
     return
   }
 
@@ -143,8 +138,8 @@ saleBtn.addEventListener('click', () => {
     return
   }
 
-  const current = Number(weightCell.textContent) || 0
-  if (sold > current + 1e-6) {
+  const current = Number(weightCell.textContent)
+  if (sold > current) {
     alert('Недостаточно остатка для продажи.')
     return
   }
@@ -152,5 +147,4 @@ saleBtn.addEventListener('click', () => {
   const updated = current - sold
   weightCell.textContent = updated.toFixed(2)
   saleValue.value = ''
-  console.log(`Продано ${sold}кг с ${saleDataValue}. Остаток ${updated.toFixed(2)}кг`)
 })
