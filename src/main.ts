@@ -10,14 +10,12 @@ const saleValue = document.querySelector('#saleValue') as HTMLInputElement
 const balance = document.querySelector('#balance') as HTMLDivElement
 const summaryDiv = document.querySelector('#summary') as HTMLDivElement // Итоговая сумма
 
-let addDataValue = ''// Наименование позиции для добавления сырья
+let addDataValue = '' // Наименование позиции для добавления сырья
 let dataLoss = 0 // Процент потерь
-
 let saleDataValue = '' // Наименование позиции для продаж
 
 //! Открыть/Закрыть кастомный селектор
 function functionToggle(id: string) {
-  // Одинаковые классы в разных id, поэтому задаем параметр id
   const container = document.querySelector(id) as HTMLElement // Теперь container наш id
   // Находим наши классы внутри каждого id
   const head = container.querySelector('.custom_select') as HTMLElement // Наименование позиции
@@ -38,7 +36,7 @@ functionToggle('#addMeat') // Блок добавления сырья
 functionToggle('#saleMeat') // Блок продаж
 
 //! Настройка селекторов выбора позиции в разных блоках
-function setupSelect(id: string, mode: 'add' | 'sale') { 
+function setupSelect(id: string, mode: 'add' | 'sale') { // лит 
   const container = document.querySelector(id) as HTMLElement // Снова заносим наши id в переменную
   const displayed = container.querySelector('.custom_select .selected') as HTMLSpanElement // Наименование позиции
   //Находим все теги li в нашем кастомном селекторе
@@ -70,7 +68,7 @@ setupSelect('#saleMeat', 'sale')
 
 // Поиск строки позиции в таблице остатков
 function findRow(value: string) {
-  const nameDiv = balance.querySelector(`div[data-value="${value}"]`) as HTMLDivElement
+  const nameDiv = balance.querySelector(`div[data-value="${value}"]`) as HTMLDivElement 
   if (!nameDiv) return null
 
   const weightDiv = nameDiv.nextElementSibling as HTMLDivElement // вес
@@ -81,20 +79,20 @@ function findRow(value: string) {
 }
 
 // Расчёт потерь
-function calculateNetWeight(rawKg: number, lossPercent: number): number {
+function calculateNetWeight(rawKg: number, lossPercent: number) {
   const lossKg = (rawKg * lossPercent) / 100
   return rawKg - lossKg
 }
 
-// Обновление суммы позиции и общей суммы
+// Обновление суммы позиции и общей суммы 
 function updateSums() {
-  let totalSum = 0
+  let totalSum = 0 
   const rows = balance.querySelectorAll('div[data-value]')
 
   rows.forEach((nameDiv) => {
-    const weightDiv = nameDiv.nextElementSibling as HTMLDivElement
-    const priceDiv = weightDiv.nextElementSibling as HTMLDivElement
-    const sumDiv = priceDiv.nextElementSibling as HTMLDivElement
+    const weightDiv = nameDiv.nextElementSibling as HTMLDivElement // вес
+    const priceDiv = weightDiv.nextElementSibling as HTMLDivElement // цена
+    const sumDiv = priceDiv.nextElementSibling as HTMLDivElement // сумма
 
     const weight = Number(weightDiv.textContent)
     const price = Number(priceDiv.textContent)
@@ -109,35 +107,35 @@ function updateSums() {
 
 // Добавить продукцию
 addBtn.addEventListener('click', () => {
-  const raw = Number(addValue.value)
+  const raw = Number(addValue.value) // вес пользователя
   if (!addDataValue) return alert('Выберите позицию для добавления.')
   if (!raw || raw <= 0) return alert('Введите корректный вес.')
 
-  const net = calculateNetWeight(raw, dataLoss)
-  const row = findRow(addDataValue)
+  const net = calculateNetWeight(raw, dataLoss) // расчитываем потери с помощью нашей функции
+  const row = findRow(addDataValue) // Находим строку в таблице по data-value
   if (!row || !row.weightDiv) return alert('Позиция не найдена.')
 
-  const current = Number(row.weightDiv.textContent) || 0
-  row.weightDiv.textContent = (current + net).toFixed(2)
+  const current = Number(row.weightDiv.textContent) // Текущий остаток
+  row.weightDiv.textContent = (current + net).toFixed(2) // добавляем вес
 
-  addValue.value = ''
-  updateSums()
+  addValue.value = '' // Очищаем поле ввода
+  updateSums() // пересчет общей суммы
 })
 
 // Продать продукцию (уменьшить остаток)
 saleBtn.addEventListener('click', () => {
-  const sold = Number(saleValue.value)
-  if (!saleDataValue) return alert('Выберите позицию для продажи.')
-  if (!sold || sold <= 0) return alert('Введите корректный вес продажи.')
+  const sold = Number(saleValue.value) // вес продажи пользователя
+  if (!saleDataValue) return alert('Выберите позицию для продажи.') // проверка позиции
+  if (!sold || sold <= 0) return alert('Введите корректный вес продажи.') // корректность веса
 
-  const row = findRow(saleDataValue)
+  const row = findRow(saleDataValue) // Находим строку в таблице по data-value
   if (!row || !row.weightDiv) return alert('Позиция не найдена.')
 
-  const current = Number(row.weightDiv.textContent)
+  const current = Number(row.weightDiv.textContent) // Текущий остаток
   if (sold > current) return alert('Недостаточно остатка!')
 
   row.weightDiv.textContent = (current - sold).toFixed(2)
 
   saleValue.value = ''
-  updateSums()
+  updateSums() // пересчет общей суммы
 })
