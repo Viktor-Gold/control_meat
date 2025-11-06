@@ -1,5 +1,39 @@
 import './style.css'
 
+//! МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ
+const modal = document.querySelector('#modal_window') as HTMLDivElement
+const loginInput = document.querySelector('#loginInput') as HTMLInputElement
+const passwordInput = document.querySelector('#passwordInput') as HTMLInputElement
+const loginBtn = document.querySelector('#loginBtn') as HTMLInputElement
+const errorMsg = document.querySelector('#errorMsg') as HTMLParagraphElement
+
+//! Блок интерфейса, пока не введены правильные данные
+document.body.style.overflow = 'hidden'
+
+//! Проверка логина и пароля
+function checkLogin() {
+  const login = loginInput.value.trim()
+  const password = passwordInput.value.trim()
+
+  if (login === 'admin' && password === '77777777') {
+    modal.style.display = 'none'
+    document.body.style.overflow = 'auto'
+  } else {
+    errorMsg.textContent = 'Неверный логин или пароль'
+    passwordInput.value = ''
+  }
+}
+
+//! При клике на кнопку "Войти"
+loginBtn.addEventListener('click', checkLogin)
+
+//! При нажатии Enter
+modal.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    checkLogin()
+  }
+})
+
 //! Кнопки
 const addBtn = document.querySelector('#addBtn') as HTMLInputElement
 const saleBtn = document.querySelector('#saleBtn') as HTMLInputElement
@@ -105,6 +139,30 @@ function updateSums() {
   summaryDiv.textContent = `Итоговая сумма: ${totalSum.toFixed(2)} ₽`
 }
 
+// ===== Сохранение данных в localStorage =====
+function saveBalanceToStorage() {
+  const data: string[] = []
+  balance.querySelectorAll('div').forEach(div => data.push(div.textContent || ''))
+  localStorage.setItem('balanceData', JSON.stringify(data))
+}
+
+// ===== Загрузка данных из localStorage =====
+function loadBalanceFromStorage() {
+  const stored = localStorage.getItem('balanceData')
+  if (!stored) return
+  const data: string[] = JSON.parse(stored)
+  const divs = balance.querySelectorAll('div')
+  data.forEach((text, i) => {
+    if (divs[i]) divs[i].textContent = text
+  })
+}
+
+// ===== Автосохранение после каждого изменения =====
+function autoSave() {
+  updateSums()
+  saveBalanceToStorage()
+}
+
 // Добавить продукцию
 addBtn.addEventListener('click', () => {
   const raw = Number(addValue.value) // вес пользователя
@@ -119,7 +177,7 @@ addBtn.addEventListener('click', () => {
   row.weightDiv.textContent = (current + net).toFixed(2) // добавляем вес
 
   addValue.value = '' // Очищаем поле ввода
-  updateSums() // пересчет общей суммы
+  autoSave() // пересчет общей суммы
 })
 
 // Продать продукцию (уменьшить остаток)
@@ -137,5 +195,9 @@ saleBtn.addEventListener('click', () => {
   row.weightDiv.textContent = (current - sold).toFixed(2)
 
   saleValue.value = ''
-  updateSums() // пересчет общей суммы
+  autoSave() // пересчет общей суммы
 })
+
+// ===== Загружаем данные при запуске =====
+loadBalanceFromStorage()
+updateSums()
