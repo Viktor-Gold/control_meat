@@ -17,7 +17,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-image: url(/public/Наша_продукция.png);
+    background-image: url(/public/Our_products.png);
     background-size: cover;
     background-color: rgb(40, 40, 40);
     color: rgb(250, 238, 223);
