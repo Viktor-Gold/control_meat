@@ -15,7 +15,7 @@ function checkLogin() {
   const login = loginInput.value.trim()
   const password = passwordInput.value.trim()
 
-  if (login == 'admin' || login == 'Admin' && password == '77777777') {
+  if (login.toLowerCase() === 'admin' && password === '77777777') {
     modal.style.display = 'none'
     document.body.style.overflow = 'auto'
   } else {

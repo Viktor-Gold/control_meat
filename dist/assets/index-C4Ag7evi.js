@@ -1,7 +1,7 @@
 (function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const n of document.querySelectorAll('link[rel="modulepreload"]'))c(n);new MutationObserver(n=>{for(const r of n)if(r.type==="childList")for(const l of r.addedNodes)l.tagName==="LINK"&&l.rel==="modulepreload"&&c(l)}).observe(document,{childList:!0,subtree:!0});function o(n){const r={};return n.integrity&&(r.integrity=n.integrity),n.referrerPolicy&&(r.referrerPolicy=n.referrerPolicy),n.crossOrigin==="use-credentials"?r.credentials="include":n.crossOrigin==="anonymous"?r.credentials="omit":r.credentials="same-origin",r}function c(n){if(n.ep)return;n.ep=!0;const r=o(n);fetch(n.href,r)}})();//! МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ
 const v=document.querySelector("#modal_window"),q=document.querySelector("#loginInput"),m=document.querySelector("#passwordInput"),E=document.querySelector("#loginBtn"),D=document.querySelector("#errorMsg");//! Блок интерфейса, пока не введены правильные данные
 document.body.style.overflow="hidden";//! Проверка логина и пароля
-function g(){const e=q.value.trim(),t=m.value.trim();e==="admin"&&t==="77777777"?(v.style.display="none",document.body.style.overflow="auto"):(D.textContent="Неверный логин или пароль",m.value="")}//! При клике на кнопку "Войти"
+function g(){const e=q.value.trim(),t=m.value.trim();e=="admin"||e=="Admin"&&t=="77777777"?(v.style.display="none",document.body.style.overflow="auto"):(D.textContent="Неверный логин или пароль",m.value="")}//! При клике на кнопку "Войти"
 E.addEventListener("click",g);//! При нажатии Enter
 v.addEventListener("keydown",e=>{e.key==="Enter"&&g()});//! Кнопки
 const L=document.querySelector("#addBtn"),C=document.querySelector("#saleBtn");//! Вес для добавления и продаж
