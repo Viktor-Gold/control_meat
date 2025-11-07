@@ -43,6 +43,10 @@ const saleValue = document.querySelector('#saleValue') as HTMLInputElement
 //! Таблица остатков
 const balance = document.querySelector('#balance') as HTMLDivElement
 const summaryDiv = document.querySelector('#summary') as HTMLDivElement // Итоговая сумма
+//! Ревизия
+const revisionBtn = document.querySelector('#revisionBtn') as HTMLInputElement
+const revisionValue = document.querySelector('#revisionValue') as HTMLInputElement
+let revisionDataValue = ''
 
 let addDataValue = '' // Наименование позиции для добавления сырья
 let dataLoss = 0 // Процент потерь
@@ -68,29 +72,29 @@ function functionToggle(id: string) {
 
 functionToggle('#addMeat') // Блок добавления сырья
 functionToggle('#saleMeat') // Блок продаж
+functionToggle('#revisionMeat') // Блок ревизии
 
 //! Настройка селекторов выбора позиции в разных блоках
-function setupSelect(id: string, mode: 'add' | 'sale') { // лит 
-  const container = document.querySelector(id) as HTMLElement // Снова заносим наши id в переменную
-  const displayed = container.querySelector('.custom_select .selected') as HTMLSpanElement // Наименование позиции
-  //Находим все теги li в нашем кастомном селекторе
-  const options = container.querySelectorAll('.select_option li') as NodeListOf<HTMLLIElement> 
+function setupSelect(id: string, mode: 'add' | 'sale' | 'revision') {
+  const container = document.querySelector(id) as HTMLElement
+  const displayed = container.querySelector('.custom_select .selected') as HTMLSpanElement
+  const options = container.querySelectorAll('.select_option li') as NodeListOf<HTMLLIElement>
 
-  options.forEach((li) => {
-    // Проходим по каждому эл-ту нашего селектора
+  options.forEach(li => {
     li.addEventListener('click', () => {
-      displayed.textContent = li.textContent //заносим наименование эл-та
-      const value = String(li.dataset.value) // Получаем имя позиции из атрибута
-      const loss = Number(li.dataset.loss) // Получаем процент потерь
+      displayed.textContent = li.textContent
+      const value = String(li.dataset.value)
+      const loss = Number(li.dataset.loss)
 
-      if (mode == 'add') { // Если клик по li в блоке добавления
-        addDataValue = value // Имя позиции
-        dataLoss = loss // Процент потерь
-      } else { // Если клик по li в блоке продаж
+      if (mode === 'add') {
+        addDataValue = value
+        dataLoss = loss
+      } else if (mode === 'sale') {
         saleDataValue = value
+      } else if (mode === 'revision') {
+        revisionDataValue = value
       }
 
-      // прячем селектор после выбора позиции
       const parent = li.closest('.select_option') as HTMLElement
       parent.style.display = 'none'
     })
@@ -99,6 +103,8 @@ function setupSelect(id: string, mode: 'add' | 'sale') { // лит
 // Вызываем функцию на блок добавления и блок продаж
 setupSelect('#addMeat', 'add') 
 setupSelect('#saleMeat', 'sale')
+setupSelect('#revisionMeat', 'revision') // настройка выбора
+
 
 // Поиск строки позиции в таблице остатков
 function findRow(value: string) {
@@ -138,6 +144,21 @@ function updateSums() {
 
   summaryDiv.textContent = `Итоговая сумма: ${totalSum.toFixed(2)} ₽`
 }
+
+
+// Добавляем обработчик для режима 'revision'
+revisionBtn.addEventListener('click', () => {
+  const value = Number(revisionValue.value)
+  if (!revisionDataValue) return alert('Выберите позицию для ревизии.')
+  if (isNaN(value) || value < 0) return alert('Введите корректный остаток.')
+
+  const row = findRow(revisionDataValue)
+  if (!row || !row.weightDiv) return alert('Позиция не найдена.')
+
+  row.weightDiv.textContent = value.toFixed(2)
+  revisionValue.value = ''
+  autoSave() // сохраняем и пересчитываем итоговую сумму
+})
 
 // ===== Сохранение данных в localStorage =====
 function saveBalanceToStorage() {
