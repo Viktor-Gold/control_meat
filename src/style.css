@@ -252,7 +252,7 @@ header img {
 
 }
 
-#saleMeat, #addMeat {
+#saleMeat, #addMeat, #revisionMeat {
     /* width: 100%; */
     position: relative;
     /* display: inline-block; */

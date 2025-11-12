@@ -8,31 +8,31 @@ const loginBtn = document.querySelector('#loginBtn') as HTMLInputElement
 const errorMsg = document.querySelector('#errorMsg') as HTMLParagraphElement
 
 //! Блок интерфейса, пока не введены правильные данные
-document.body.style.overflow = 'hidden'
+// document.body.style.overflow = 'hidden'
 
 //! Проверка логина и пароля
-function checkLogin() {
-  const login = loginInput.value.trim()
-  const password = passwordInput.value.trim()
+// function checkLogin() {
+//   const login = loginInput.value.trim()
+//   const password = passwordInput.value.trim()
 
-  if (login.toLowerCase() === 'admin' && password === '77777777') {
-    modal.style.display = 'none'
-    document.body.style.overflow = 'auto'
-  } else {
-    errorMsg.textContent = 'Неверный логин или пароль'
-    passwordInput.value = ''
-  }
-}
+//   if (login.toLowerCase() === 'admin' && password === '77777777') {
+//     modal.style.display = 'none'
+//     document.body.style.overflow = 'auto'
+//   } else {
+//     errorMsg.textContent = 'Неверный логин или пароль'
+//     passwordInput.value = ''
+//   }
+// }
 
 //! При клике на кнопку "Войти"
-loginBtn.addEventListener('click', checkLogin)
+// loginBtn.addEventListener('click', checkLogin)
 
 //! При нажатии Enter
-modal.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    checkLogin()
-  }
-})
+// modal.addEventListener('keydown', (e) => {
+//   if (e.key === 'Enter') {
+//     checkLogin()
+//   }
+// })
 
 //! Кнопки
 const addBtn = document.querySelector('#addBtn') as HTMLInputElement
