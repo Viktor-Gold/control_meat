@@ -1,3 +1,5 @@
+import { auth } from './firebase'
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import './style.css'
 
 //! МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ
@@ -11,14 +13,17 @@ const errorMsg = document.querySelector('#errorMsg') as HTMLParagraphElement
 document.body.style.overflow = 'hidden'
 
 //! Проверка логина и пароля
-function checkLogin() {
+async function checkLogin() {
   const login = loginInput.value.trim()
   const password = passwordInput.value.trim()
 
-  if (login.toLowerCase() === 'admin' && password === 'meat1515') {
+  try {
+    await signInWithEmailAndPassword(auth, login, password)
+
     modal.style.display = 'none'
     document.body.style.overflow = 'auto'
-  } else {
+    errorMsg.textContent = ''
+  } catch (error) {
     errorMsg.textContent = 'Неверный логин или пароль'
     passwordInput.value = ''
   }
@@ -222,3 +227,14 @@ saleBtn.addEventListener('click', () => {
 // ===== Загружаем данные при запуске =====
 loadBalanceFromStorage()
 updateSums()
+
+//Защита при обновлении страницы
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    modal.style.display = 'none'
+    document.body.style.overflow = 'auto'
+  } else {
+    modal.style.display = 'flex'
+    document.body.style.overflow = 'hidden'
+  }
+})
