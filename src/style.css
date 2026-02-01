@@ -278,7 +278,7 @@ header img {
     border: 1px solid brown;
 }
 
-#balance>div:nth-child(-n+4), #summary, #balance>div:nth-child(77){
+#balance>div:nth-child(-n+4), #summary, #balance>div:nth-child(81){
     font-size: 16px;
     /* letter-spacing: 1px; */
     font-weight: bold;
