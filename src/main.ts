@@ -273,21 +273,23 @@ async function initFirestoreIfEmpty() {
 
   console.log('Инициализация Firestore начальными данными')
 
-  const rows = balance.querySelectorAll('div[data-value]')
+  const rows = balance.querySelectorAll<HTMLDivElement>('div[data-value]')
 
   for (const nameDiv of rows) {
-    const value = nameDiv.dataset.value!
-    const weightDiv = nameDiv.nextElementSibling as HTMLDivElement
-    const priceDiv = weightDiv.nextElementSibling as HTMLDivElement
+  const value = nameDiv.dataset.value
+  if (!value) continue
 
-    const weight = Number(weightDiv.textContent) || 0
-    const price = Number(priceDiv.textContent) || 0
+  const weightDiv = nameDiv.nextElementSibling as HTMLDivElement
+  const priceDiv = weightDiv.nextElementSibling as HTMLDivElement
 
-    await setDoc(doc(db, 'balance', value), {
-      weight,
-      price
-    })
-  }
+  const weight = Number(weightDiv.textContent) || 0
+  const price = Number(priceDiv.textContent) || 0
+
+  await setDoc(doc(db, 'balance', value), {
+    weight,
+    price
+  })
+}
 }
 
 
