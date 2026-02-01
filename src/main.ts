@@ -1,201 +1,298 @@
 import { db } from './firebase'
-import {
-  collection,
-  onSnapshot,
-  doc,
-  setDoc,
-  getDocs
-} from 'firebase/firestore'
+import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore'
 import { auth } from './firebase'
-import {
-  signInWithEmailAndPassword,
-  onAuthStateChanged
-} from 'firebase/auth'
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import './style.css'
 
-// ================== AUTH MODAL ==================
+//! МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ
 const modal = document.querySelector('#modal_window') as HTMLDivElement
 const loginInput = document.querySelector('#loginInput') as HTMLInputElement
 const passwordInput = document.querySelector('#passwordInput') as HTMLInputElement
 const loginBtn = document.querySelector('#loginBtn') as HTMLInputElement
 const errorMsg = document.querySelector('#errorMsg') as HTMLParagraphElement
 
+//! Блок интерфейса, пока не введены правильные данные
 document.body.style.overflow = 'hidden'
 
+//! Проверка логина и пароля
 async function checkLogin() {
+  const login = loginInput.value.trim()
+  const password = passwordInput.value.trim()
+
   try {
-    await signInWithEmailAndPassword(
-      auth,
-      loginInput.value.trim(),
-      passwordInput.value.trim()
-    )
+    await signInWithEmailAndPassword(auth, login, password)
+
+    modal.style.display = 'none'
+    document.body.style.overflow = 'auto'
     errorMsg.textContent = ''
-  } catch {
+  } catch (error) {
     errorMsg.textContent = 'Неверный логин или пароль'
     passwordInput.value = ''
   }
 }
 
+//! При клике на кнопку "Войти"
 loginBtn.addEventListener('click', checkLogin)
-modal.addEventListener('keydown', e => e.key === 'Enter' && checkLogin())
 
-// ================== UI ELEMENTS ==================
+//! При нажатии Enter
+modal.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    checkLogin()
+  }
+})
+
+//! Кнопки
 const addBtn = document.querySelector('#addBtn') as HTMLInputElement
 const saleBtn = document.querySelector('#saleBtn') as HTMLInputElement
-const revisionBtn = document.querySelector('#revisionBtn') as HTMLInputElement
-
+//! Вес для добавления и продаж
 const addValue = document.querySelector('#addValue') as HTMLInputElement
 const saleValue = document.querySelector('#saleValue') as HTMLInputElement
-const revisionValue = document.querySelector('#revisionValue') as HTMLInputElement
-
+//! Таблица остатков
 const balance = document.querySelector('#balance') as HTMLDivElement
-const summaryDiv = document.querySelector('#summary') as HTMLDivElement
-
-let addDataValue = ''
-let saleDataValue = ''
+const summaryDiv = document.querySelector('#summary') as HTMLDivElement // Итоговая сумма
+//! Ревизия
+const revisionBtn = document.querySelector('#revisionBtn') as HTMLInputElement
+const revisionValue = document.querySelector('#revisionValue') as HTMLInputElement
 let revisionDataValue = ''
-let dataLoss = 0
 
-// ================== SELECTORS ==================
+let addDataValue = '' // Наименование позиции для добавления сырья
+let dataLoss = 0 // Процент потерь
+let saleDataValue = '' // Наименование позиции для продаж
+
+//! Открыть/Закрыть кастомный селектор
+function functionToggle(id: string) {
+  const container = document.querySelector(id) as HTMLElement // Теперь container наш id
+  // Находим наши классы внутри каждого id
+  const head = container.querySelector('.custom_select') as HTMLElement // Наименование позиции
+  const dropdown = container.querySelector('.select_option') as HTMLElement // Кастомный селектор
+
+  head.addEventListener('click', () => {
+    // Открываем селектор выбора
+    dropdown.style.display = dropdown.style.display == 'block' ? 'none' : 'block'
+  })
+
+  // Закрывает селектор при клике вне родителя
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target as Node)) dropdown.style.display = 'none'
+  })
+}
+
+functionToggle('#addMeat') // Блок добавления сырья
+functionToggle('#saleMeat') // Блок продаж
+functionToggle('#revisionMeat') // Блок ревизии
+
+//! Настройка селекторов выбора позиции в разных блоках
 function setupSelect(id: string, mode: 'add' | 'sale' | 'revision') {
   const container = document.querySelector(id) as HTMLElement
-  const selected = container.querySelector('.selected') as HTMLSpanElement
-  const options = container.querySelectorAll('li')
+  const displayed = container.querySelector('.custom_select .selected') as HTMLSpanElement
+  const options = container.querySelectorAll('.select_option li') as NodeListOf<HTMLLIElement>
 
   options.forEach(li => {
     li.addEventListener('click', () => {
-      selected.textContent = li.textContent
+      displayed.textContent = li.textContent
       const value = String(li.dataset.value)
-      const loss = Number(li.dataset.loss || 0)
+      const loss = Number(li.dataset.loss)
 
       if (mode === 'add') {
         addDataValue = value
         dataLoss = loss
+      } else if (mode === 'sale') {
+        saleDataValue = value
+      } else if (mode === 'revision') {
+        revisionDataValue = value
       }
-      if (mode === 'sale') saleDataValue = value
-      if (mode === 'revision') revisionDataValue = value
 
-      ;(li.closest('.select_option') as HTMLElement).style.display = 'none'
+      const parent = li.closest('.select_option') as HTMLElement
+      parent.style.display = 'none'
     })
   })
 }
-
-setupSelect('#addMeat', 'add')
+// Вызываем функцию на блок добавления и блок продаж
+setupSelect('#addMeat', 'add') 
 setupSelect('#saleMeat', 'sale')
-setupSelect('#revisionMeat', 'revision')
+setupSelect('#revisionMeat', 'revision') // настройка выбора
 
-// ================== HELPERS ==================
+
+// Поиск строки позиции в таблице остатков
 function findRow(value: string) {
-  const nameDiv = balance.querySelector(`div[data-value="${value}"]`) as HTMLDivElement
+  const nameDiv = balance.querySelector(`div[data-value="${value}"]`) as HTMLDivElement 
   if (!nameDiv) return null
-  const weightDiv = nameDiv.nextElementSibling as HTMLDivElement
-  const priceDiv = weightDiv.nextElementSibling as HTMLDivElement
-  const sumDiv = priceDiv.nextElementSibling as HTMLDivElement
-  return { weightDiv, priceDiv, sumDiv }
+
+  const weightDiv = nameDiv.nextElementSibling as HTMLDivElement // вес
+  const priceDiv = weightDiv?.nextElementSibling as HTMLDivElement // цена
+  const sumDiv = priceDiv?.nextElementSibling as HTMLDivElement // сумма
+
+  return { nameDiv, weightDiv, priceDiv, sumDiv }
 }
 
+// Расчёт потерь
+function calculateNetWeight(rawKg: number, lossPercent: number) {
+  const lossKg = (rawKg * lossPercent) / 100
+  return rawKg - lossKg
+}
+
+// Обновление суммы позиции и общей суммы 
 function updateSums() {
-  let total = 0
-  balance.querySelectorAll('div[data-value]').forEach(nameDiv => {
-    const w = nameDiv.nextElementSibling as HTMLDivElement
-    const p = w.nextElementSibling as HTMLDivElement
-    const s = p.nextElementSibling as HTMLDivElement
-    const sum = Number(w.textContent) * Number(p.textContent)
-    s.textContent = sum.toFixed(2)
-    total += sum
+  let totalSum = 0 
+  const rows = balance.querySelectorAll('div[data-value]')
+
+  rows.forEach((nameDiv) => {
+    const weightDiv = nameDiv.nextElementSibling as HTMLDivElement // вес
+    const priceDiv = weightDiv.nextElementSibling as HTMLDivElement // цена
+    const sumDiv = priceDiv.nextElementSibling as HTMLDivElement // сумма
+
+    const weight = Number(weightDiv.textContent)
+    const price = Number(priceDiv.textContent)
+    const sum = weight * price
+
+    sumDiv.textContent = sum.toFixed(2)
+    totalSum += sum
   })
-  summaryDiv.textContent = `Итоговая сумма: ${total.toFixed(2)} ₽`
+
+  summaryDiv.textContent = `Итоговая сумма: ${totalSum.toFixed(2)} ₽`
 }
 
-function netWeight(raw: number, loss: number) {
-  return raw - (raw * loss) / 100
-}
 
-// ================== FIRESTORE ==================
-const balanceRef = collection(db, 'balance')
+// Добавляем обработчик для режима 'revision'
+revisionBtn.addEventListener('click', () => {
+  const value = Number(revisionValue.value)
+  if (!revisionDataValue) return alert('Выберите позицию для ревизии.')
+  if (isNaN(value) || value < 0) return alert('Введите корректный остаток.')
 
-async function save(value: string, weight: number, price: number) {
-  await setDoc(doc(db, 'balance', value), { weight, price })
-}
+  const row = findRow(revisionDataValue)
+  if (!row || !row.weightDiv) return alert('Позиция не найдена.')
 
-// ===== INIT ONLY ONCE =====
-async function initFirestoreIfEmpty() {
-  const snapshot = await getDocs(balanceRef)
-  if (!snapshot.empty) return
-
-  const rows = balance.querySelectorAll<HTMLDivElement>('div[data-value]')
-  for (const nameDiv of rows) {
-    const value = nameDiv.dataset.value!
-    const weight = Number(nameDiv.nextElementSibling!.textContent) || 0
-    const price = Number(
-      nameDiv.nextElementSibling!.nextElementSibling!.textContent
-    )
-    await setDoc(doc(db, 'balance', value), { weight, price })
-  }
-}
-
-// ================== ACTIONS ==================
-addBtn.onclick = async () => {
-  if (!addDataValue) return alert('Выберите позицию')
-  const raw = Number(addValue.value)
-  if (raw <= 0) return
-
-  const row = findRow(addDataValue)!
-  const newWeight = Number(row.weightDiv.textContent) + netWeight(raw, dataLoss)
-  row.weightDiv.textContent = newWeight.toFixed(2)
-  await save(addDataValue, newWeight, Number(row.priceDiv.textContent))
+  row.weightDiv.textContent = value.toFixed(2)
+  const price = Number(row.priceDiv.textContent)
+  saveWeightToFirestore(revisionDataValue, value, price)
   updateSums()
-}
+})
 
-saleBtn.onclick = async () => {
-  if (!saleDataValue) return alert('Выберите позицию')
-  const sold = Number(saleValue.value)
-  if (sold <= 0) return
 
-  const row = findRow(saleDataValue)!
-  const current = Number(row.weightDiv.textContent)
-  if (sold > current) return alert('Недостаточно остатка')
+
+// Добавить продукцию
+addBtn.addEventListener('click', () => {
+  const raw = Number(addValue.value) // вес пользователя
+  if (!addDataValue) return alert('Выберите позицию для добавления.')
+  if (!raw || raw <= 0) return alert('Введите корректный вес.')
+
+  const net = calculateNetWeight(raw, dataLoss) // расчитываем потери с помощью нашей функции
+  const row = findRow(addDataValue) // Находим строку в таблице по data-value
+  if (!row || !row.weightDiv) return alert('Позиция не найдена.')
+
+  const current = Number(row.weightDiv.textContent) // Текущий остаток
+  const newWeight = current + net
+  row.weightDiv.textContent = newWeight.toFixed(2)
+
+  addValue.value = ''
+
+  const price = Number(row.priceDiv.textContent)
+  saveWeightToFirestore(addDataValue, newWeight, price)
+  updateSums()
+})
+
+// Продать продукцию (уменьшить остаток)
+saleBtn.addEventListener('click', () => {
+  const sold = Number(saleValue.value) // вес продажи пользователя
+  if (!saleDataValue) return alert('Выберите позицию для продажи.') // проверка позиции
+  if (!sold || sold <= 0) return alert('Введите корректный вес продажи.') // корректность веса
+
+  const row = findRow(saleDataValue) // Находим строку в таблице по data-value
+  if (!row || !row.weightDiv) return alert('Позиция не найдена.')
+
+  const current = Number(row.weightDiv.textContent) // Текущий остаток
+  if (sold > current) return alert('Недостаточно остатка!')
 
   const newWeight = current - sold
   row.weightDiv.textContent = newWeight.toFixed(2)
-  await save(saleDataValue, newWeight, Number(row.priceDiv.textContent))
+
+  saleValue.value = ''
+
+  const price = Number(row.priceDiv.textContent)
+  saveWeightToFirestore(saleDataValue, newWeight, price)
   updateSums()
-}
-
-revisionBtn.onclick = async () => {
-  if (!revisionDataValue) return
-  const value = Number(revisionValue.value)
-  if (value < 0) return
-
-  const row = findRow(revisionDataValue)!
-  row.weightDiv.textContent = value.toFixed(2)
-  await save(revisionDataValue, value, Number(row.priceDiv.textContent))
-  updateSums()
-}
-
-// ================== AUTH + SYNC ==================
-onAuthStateChanged(auth, async user => {
-  if (!user) {
-    modal.style.display = 'flex'
-    document.body.style.overflow = 'hidden'
-    return
-  }
-
-  modal.style.display = 'none'
-  document.body.style.overflow = 'auto'
-
-  await initFirestoreIfEmpty()
-
-  onSnapshot(balanceRef, snap => {
-    snap.forEach(d => {
-      const row = findRow(d.id)
-      if (!row) return
-      row.weightDiv.textContent = String(d.data().weight)
-      row.priceDiv.textContent = String(d.data().price)
-    })
-    updateSums()
-  })
 })
 
+// ===== Загружаем данные при запуске =====
+updateSums()
+
+//Защита при обновлении страницы
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    modal.style.display = 'none'
+    document.body.style.overflow = 'auto'
+  } else {
+    modal.style.display = 'flex'
+    document.body.style.overflow = 'hidden'
+  }
+})
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    modal.style.display = 'none'
+    document.body.style.overflow = 'auto'
+
+    await initFirestoreIfEmpty() // ← ВАЖНО
+  } else {
+    modal.style.display = 'flex'
+    document.body.style.overflow = 'hidden'
+  }
+})
+
+// ===== Загрузка и синхронизация остатков из Firestore =====
+const balanceRef = collection(db, 'balance')
+
+onSnapshot(balanceRef, (snapshot) => {
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data()
+    const row = findRow(docSnap.id)
+
+    if (!row || !row.weightDiv || !row.priceDiv) return
+
+    row.weightDiv.textContent = String(data.weight)
+    row.priceDiv.textContent = String(data.price)
+  })
+
+  updateSums()
+})
+
+async function saveWeightToFirestore(
+  value: string,
+  weight: number,
+  price: number
+) {
+  await setDoc(doc(db, 'balance', value), {
+    weight,
+    price
+  })
+}
+
+async function initFirestoreIfEmpty() {
+  const snapshot = await new Promise<any>((resolve) => {
+    onSnapshot(balanceRef, (snap) => resolve(snap))
+  })
+
+  if (!snapshot.empty) return // база уже есть — ничего не делаем
+
+  console.log('Инициализация Firestore начальными данными')
+
+  const rows = balance.querySelectorAll<HTMLDivElement>('div[data-value]')
+
+  for (const nameDiv of rows) {
+  const value = nameDiv.dataset.value
+  if (!value) continue
+
+  const weightDiv = nameDiv.nextElementSibling as HTMLDivElement
+  const priceDiv = weightDiv.nextElementSibling as HTMLDivElement
+
+  const weight = Number(weightDiv.textContent) || 0
+  const price = Number(priceDiv.textContent) || 0
+
+  await setDoc(doc(db, 'balance', value), {
+    weight,
+    price
+  })
+}
+}
 
 
