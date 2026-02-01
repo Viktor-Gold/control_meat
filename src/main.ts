@@ -1,3 +1,5 @@
+import { db } from './firebase'
+import { collection, onSnapshot, doc, setDoc } from 'firebase/firestore'
 import { auth } from './firebase'
 import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
 import './style.css'
@@ -161,33 +163,11 @@ revisionBtn.addEventListener('click', () => {
   if (!row || !row.weightDiv) return alert('Позиция не найдена.')
 
   row.weightDiv.textContent = value.toFixed(2)
-  revisionValue.value = ''
-  autoSave() // сохраняем и пересчитываем итоговую сумму
+  const price = Number(row.priceDiv.textContent)
+  saveWeightToFirestore(revisionDataValue, value, price)
 })
 
-// ===== Сохранение данных в localStorage =====
-function saveBalanceToStorage() {
-  const data: string[] = []
-  balance.querySelectorAll('div').forEach(div => data.push(div.textContent || ''))
-  localStorage.setItem('balanceData', JSON.stringify(data))
-}
 
-// ===== Загрузка данных из localStorage =====
-function loadBalanceFromStorage() {
-  const stored = localStorage.getItem('balanceData')
-  if (!stored) return
-  const data: string[] = JSON.parse(stored)
-  const divs = balance.querySelectorAll('div')
-  data.forEach((text, i) => {
-    if (divs[i]) divs[i].textContent = text
-  })
-}
-
-// ===== Автосохранение после каждого изменения =====
-function autoSave() {
-  updateSums()
-  saveBalanceToStorage()
-}
 
 // Добавить продукцию
 addBtn.addEventListener('click', () => {
@@ -200,10 +180,13 @@ addBtn.addEventListener('click', () => {
   if (!row || !row.weightDiv) return alert('Позиция не найдена.')
 
   const current = Number(row.weightDiv.textContent) // Текущий остаток
-  row.weightDiv.textContent = (current + net).toFixed(2) // добавляем вес
+  const newWeight = current + net
+  row.weightDiv.textContent = newWeight.toFixed(2)
 
-  addValue.value = '' // Очищаем поле ввода
-  autoSave() // пересчет общей суммы
+  addValue.value = ''
+
+  const price = Number(row.priceDiv.textContent)
+  saveWeightToFirestore(addDataValue, newWeight, price)
 })
 
 // Продать продукцию (уменьшить остаток)
@@ -218,14 +201,16 @@ saleBtn.addEventListener('click', () => {
   const current = Number(row.weightDiv.textContent) // Текущий остаток
   if (sold > current) return alert('Недостаточно остатка!')
 
-  row.weightDiv.textContent = (current - sold).toFixed(2)
+  const newWeight = current - sold
+  row.weightDiv.textContent = newWeight.toFixed(2)
 
   saleValue.value = ''
-  autoSave() // пересчет общей суммы
+
+  const price = Number(row.priceDiv.textContent)
+  saveWeightToFirestore(saleDataValue, newWeight, price)
 })
 
 // ===== Загружаем данные при запуске =====
-loadBalanceFromStorage()
 updateSums()
 
 //Защита при обновлении страницы
@@ -238,3 +223,32 @@ onAuthStateChanged(auth, (user) => {
     document.body.style.overflow = 'hidden'
   }
 })
+
+// ===== Загрузка и синхронизация остатков из Firestore =====
+const balanceRef = collection(db, 'balance')
+
+onSnapshot(balanceRef, (snapshot) => {
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data()
+    const row = findRow(docSnap.id)
+
+    if (!row || !row.weightDiv || !row.priceDiv) return
+
+    row.weightDiv.textContent = String(data.weight)
+    row.priceDiv.textContent = String(data.price)
+  })
+
+  updateSums()
+})
+
+async function saveWeightToFirestore(
+  value: string,
+  weight: number,
+  price: number
+) {
+  await setDoc(doc(db, 'balance', value), {
+    weight,
+    price
+  })
+}
+
