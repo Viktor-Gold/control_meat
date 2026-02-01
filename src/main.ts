@@ -224,6 +224,18 @@ onAuthStateChanged(auth, (user) => {
   }
 })
 
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    modal.style.display = 'none'
+    document.body.style.overflow = 'auto'
+
+    await initFirestoreIfEmpty() // ← ВАЖНО
+  } else {
+    modal.style.display = 'flex'
+    document.body.style.overflow = 'hidden'
+  }
+})
+
 // ===== Загрузка и синхронизация остатков из Firestore =====
 const balanceRef = collection(db, 'balance')
 
@@ -251,4 +263,31 @@ async function saveWeightToFirestore(
     price
   })
 }
+
+async function initFirestoreIfEmpty() {
+  const snapshot = await new Promise<any>((resolve) => {
+    onSnapshot(balanceRef, (snap) => resolve(snap))
+  })
+
+  if (!snapshot.empty) return // база уже есть — ничего не делаем
+
+  console.log('Инициализация Firestore начальными данными')
+
+  const rows = balance.querySelectorAll('div[data-value]')
+
+  for (const nameDiv of rows) {
+    const value = nameDiv.dataset.value!
+    const weightDiv = nameDiv.nextElementSibling as HTMLDivElement
+    const priceDiv = weightDiv.nextElementSibling as HTMLDivElement
+
+    const weight = Number(weightDiv.textContent) || 0
+    const price = Number(priceDiv.textContent) || 0
+
+    await setDoc(doc(db, 'balance', value), {
+      weight,
+      price
+    })
+  }
+}
+
 
