@@ -1,0 +1,21 @@
+{
+"marbledSausages": { "weight": 0, "price": 650 },
+  "beef-porkSausages": { "weight": 0, "price": 440 },
+  "chickenSausages": { "weight": 0, "price": 650 },
+  "porkSausages": { "weight": 0, "price": 430 },
+  "chickenHam": { "weight": 0, "price": 750 },
+  "chickenCarcass": { "weight": 0, "price": 550 },
+  "chickenWings": { "weight": 0, "price": 490 },
+  "chickenLeg": { "weight": 0, "price": 590 },
+  "chickenBreast": { "weight": 0, "price": 600 },
+  "chickenFillet": { "weight": 0, "price": 660 },
+  "chickenBacks": { "weight": 0, "price": 290 },
+  "porkTenderloin": { "weight": 0, "price": 750 },
+  "porkRibs": { "weight": 0, "price": 640 },
+  "porkBelly": { "weight": 0, "price": 750 },
+  "porkHam": { "weight": 0, "price": 680 },
+  "meatBomb": { "weight": 0, "price": 580 },
+  "meatBread": { "weight": 0, "price": 350 },
+  "signatureLard": { "weight": 0, "price": 300 },
+  "lard": { "weight": 0, "price": 300 }
+}
